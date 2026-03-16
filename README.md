@@ -1,0 +1,3 @@
+# clopen-web
+
+This repository contains only the static landing page. For the actual application, see the main clopen repository: [github.com/myrialabs/clopen](https://github.com/myrialabs/clopen)
