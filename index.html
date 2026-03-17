@@ -476,6 +476,42 @@
     .fade-in-4 { animation: fadeInUp 0.7s 0.45s ease forwards; opacity: 0; }
     .fade-in-5 { animation: fadeInUp 0.7s 0.6s  ease forwards; opacity: 0; }
 
+    /* ---- LIGHTBOX ---- */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .lightbox.open { opacity: 1; visibility: visible; }
+    .lightbox img {
+      max-width: 100%; max-height: 90vh;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-bright);
+      box-shadow: 0 40px 120px rgba(0,0,0,0.8), 0 0 60px rgba(139,92,246,0.15);
+      transform: scale(0.94);
+      transition: transform 0.25s ease;
+      display: block;
+    }
+    .lightbox.open img { transform: scale(1); }
+    .lightbox-close {
+      position: fixed; top: 20px; right: 24px;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--bg-3); border: 1px solid var(--border-bright);
+      color: var(--text-1);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 20px; line-height: 1;
+      transition: background 0.2s, color 0.2s;
+    }
+    .lightbox-close:hover { background: var(--bg-4); color: var(--text-0); }
+    .showcase-img-wrap img, .hero-screenshot-frame img {
+      cursor: zoom-in;
+    }
+
     /* ---- SCROLLBAR ---- */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: var(--bg-0); }
@@ -838,6 +874,12 @@
 
   </main>
 
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image preview">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+    <img src="" alt="" id="lightbox-img" />
+  </div>
+
   <!-- FOOTER -->
   <footer>
     <div class="container">
@@ -886,6 +928,32 @@
       el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
       observer.observe(el);
     });
+
+    (function() {
+      const lb = document.getElementById('lightbox');
+      const lbImg = document.getElementById('lightbox-img');
+      const lbClose = document.getElementById('lightbox-close');
+
+      function openLightbox(src, alt) {
+        lbImg.src = src;
+        lbImg.alt = alt || '';
+        lb.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeLightbox() {
+        lb.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      document.querySelectorAll('.showcase-img-wrap img, .hero-screenshot-frame img').forEach(img => {
+        img.addEventListener('click', () => openLightbox(img.src, img.alt));
+      });
+
+      lbClose.addEventListener('click', closeLightbox);
+      lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+    })();
 
     document.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener('click', e => {
